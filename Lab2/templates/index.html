@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Архиватор</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+<div style="text-align: center;">
+    <div>
+        <input id="fileupload" type="file" name="file"/>
+
+    </div>
+    <br>
+    <div class="result">
+        <div class="decompressed_data"></div>
+        <div class="uncompressed_size"></div>
+        <div class="compressed_size"></div>
+        <br>
+        <div class="compressed_data"></div>
+    </div>
+    <div class="download_file" style="display: none">
+        <form method="post" class="download_file_form">
+            <button type="submit">Скачать файл</button>
+        </form>
+    </div>
+</div>
+
+<div style="text-align: center;">
+    <div>
+        <button id="upload-compress-button-Huffman" onclick="CompressHuffmanFile()">Compress Huffman</button>
+        <button id="upload-decompress-button-Huffman" onclick="DecompressHuffmanFile()">Decompress Huffman</button>
+        <button id="upload-compress-button" onclick="CompressFile()">Compress LZW</button>
+        <button id="upload-decompress-button" onclick="DecompressFile()">Decompress LZW</button>
+    </div>
+    <br>
+</div>
+</body>
+<script>
+
+    async function CompressFile() {
+        clean_data_form()
+
+        let formData = new FormData();
+        formData.append("file", fileupload.files[0]);
+        await fetch('/compress', {
+            method: "POST",
+            body: formData,
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            let stat1 = "Длина изначального сообщения составляет " + data["uncompressed_size"] + " бит"
+            let stat2 = "Длина закодированного сообщения составляет " + data["compressed_size"] + " бит"
+            let compressed_data = "Закодированные данные <br>" + data["compressed_data"]
+            $('.uncompressed_size').html(stat1)
+            $('.compressed_size').html(stat2)
+            $('.compressed_data').html(compressed_data)
+            GetFile("compressed.txt")
+        });
+    }
+
+    async function DecompressFile() {
+        clean_data_form()
+
+        let formData = new FormData();
+        formData.append("file", fileupload.files[0]);
+        await fetch('/decompress', {
+            method: "POST",
+            body: formData,
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            let decompressed_data = "Расшифрованное сообщение <br>" + data["decompressed_data"]
+            $('.decompressed_data').html(decompressed_data)
+            GetFile("decompressed.txt")
+        });
+    }
+
+    async function GetFile(type) {
+        $('.download_file').show()
+        $('.download_file_form').attr("action", "/get_file?file=" + type)
+    }
+
+    function clean_data_form() {
+        $('.decompressed_data').empty()
+        $('.uncompressed_size').empty()
+        $('.compressed_size').empty()
+        $('.compressed_data').empty()
+    }
+
+    async function CompressHuffmanFile() {
+        clean_data_form()
+
+        let formData = new FormData();
+        formData.append("file", fileupload.files[0]);
+        await fetch('/compressHuffman', {
+            method: "POST",
+            body: formData,
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            let stat1 = "Длина изначального сообщения составляет " + data["uncompressed_size"] + " бит"
+            let stat2 = "Длина закодированного сообщения составляет " + data["compressed_size"] + " бит"
+            let compressed_data = "Закодированные данные <br>" + data["compressed_data"]
+            $('.uncompressed_size').html(stat1)
+            $('.compressed_size').html(stat2)
+            $('.compressed_data').html(compressed_data)
+            GetFile("compressed.txt")
+        });
+    }
+
+    async function DecompressHuffmanFile() {
+        clean_data_form()
+
+        let formData = new FormData();
+        formData.append("file", fileupload.files[0]);
+        await fetch('/decompressHuffman', {
+            method: "POST",
+            body: formData,
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            let decompressed_data = "Расшифрованное сообщение <br>" + data["decompressed_data"]
+            $('.decompressed_data').html(decompressed_data)
+            GetFile("decompressed.txt")
+        });
+    }
+
+</script>
+</html>
