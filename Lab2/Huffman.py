@@ -36,6 +36,7 @@ class HuffmanCode(object):
             f1, item1 = h.pop()
             f2, item2 = h.pop()
             h.append((f1 + f2, Node(item1, item2)))
+            h = sorted(h, key=lambda x: x[0], reverse=True)
         h[0][1].walk(self.codeTree, '')
         result = []
         for i in uncompressed_data:
